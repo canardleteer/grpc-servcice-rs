@@ -205,3 +205,6 @@ status: SERVING
 - Add some thin Docker containers
 - Add a `docker-compose.yaml`
   - Add useful proxying in the `docker-compose.yaml`
+- Overall, this may work better as a Cargo Workspace.
+  - Sharing a crate on top of a shared proto directory.
+  - Remove some of the uniform logging initalizers.
