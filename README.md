@@ -37,7 +37,7 @@ for PRJ in client service; do
     cargo add clap@4 --features=derive,env,cargo
 
     # Add a "bunch of service stuff"
-    cargo add tonic prost prost-types tonic-reflection tonic-health env_logger@0.10 tracing@0.1;
+    cargo add tonic prost prost-types tonic-reflection tonic-health env_logger@0.10 tracing@0.1
 
     # Add the Tracing Layer components + environment features.
     cargo add tracing-subscriber --features=env-filter
