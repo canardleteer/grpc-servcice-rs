@@ -14,6 +14,8 @@ pub mod time_svc_decl {
 
 pub const TIME_SVC_FILE_DESCRIPTOR_SET: &[u8] = tonic::include_file_descriptor_set!("_descriptor");
 
+/// This is generally our Command Line Arguments declaration for the client,
+/// nothing fancy here.
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Cli {
@@ -38,13 +40,14 @@ struct Cli {
     service_port: u16,
 }
 
+/// All this application does, is call the service exactly once.
 #[tokio::main]
 #[instrument(level = "info")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Parse our CLI Args
     let args = Cli::parse();
 
-    // Setup logging.
+    // Setup logging. See the notes in the service for more information.
     setup_logging();
 
     // Build a client.
@@ -70,24 +73,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// In general, this should lead to a more common definition, uniform for
+/// In general, this should lead to a more common definition, that is uniform for
 /// your services fleet, wiring up to your observability stack as
 /// appropriate.
 ///
 /// This is somewhat overkill for this example, but get's things in place
 /// for the layered approach for tracing.
 fn setup_logging() {
+    // Filter our emissions, based on environment.
     let text_filter = tracing_subscriber::EnvFilter::builder()
         .with_default_directive(LevelFilter::INFO.into())
         .from_env_lossy();
     let text_filter_level = text_filter.max_level_hint();
 
+    // We only intend to ship logs via stdout, in this example.
     let stdout_layer = tracing_subscriber::fmt::layer()
         .pretty()
         .with_filter(text_filter);
 
+    // Make a telemetry Subscriber, from the overall Tracing system.
     let subscriber = Registry::default().with(stdout_layer);
 
+    // And set this Subscriber, as the global defaul for this application.
     match tracing::subscriber::set_global_default(subscriber) {
         Ok(_) => {
             warn!("Text to stdout Level set to: {:?}", text_filter_level);
