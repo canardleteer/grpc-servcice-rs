@@ -261,7 +261,7 @@ but there are likley more and better tools now.
 ### Output
 
 - We can view the schema in the Buf Schema Registry: [https://buf.build/canardleteer/grpc-service-rs](https://buf.build/canardleteer/grpc-service-rs).
-- We can view the docker image on Dockerhub: [https://hub.docker.com/repository/docker/canardleteer/grpc-service-rs/](https://hub.docker.com/repository/docker/canardleteer/grpc-service-rs/)
+- We can view the docker image on Dockerhub: [https://hub.docker.com/r/canardleteer/grpc-service-rs](https://hub.docker.com/r/canardleteer/grpc-service-rs)
 
 ## `docker compose`
 
