@@ -263,7 +263,26 @@ but there are likley more and better tools now.
 - We can view the schema in the Buf Schema Registry: [https://buf.build/canardleteer/grpc-service-rs](https://buf.build/canardleteer/grpc-service-rs).
 - We can view the docker image on Dockerhub: [https://hub.docker.com/repository/docker/canardleteer/grpc-service-rs/](https://hub.docker.com/repository/docker/canardleteer/grpc-service-rs/)
 
-## TODO
+## `docker compose`
 
-- Add a `docker-compose.yaml`
-  - Add useful proxying in the `docker-compose.yaml`
+Basic `docker compose` with Envoy:
+
+```shell
+docker compose up --build
+
+grpcurl -plaintext localhost:10200 describe
+grpcurl -plaintext localhost:10200 com.github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService/WhatTimeIsIt
+```
+
+### Advanced `docker compose` with Envoy
+
+**NOTE:** I haven't quite gotten gRPC transcoding working yet.
+
+- There is a mostly commented out configuration in a second Envoy listener in `envoy/envoy.yaml`
+- There is a commented out file mapping for `time_service.binpb` in `docker-compose.yaml`
+
+To generate `envoy/time_service.binpb`, you'll need to do the following:
+
+```text
+buf build --as-file-descriptor-set -o envoy/time_service.binpb
+```
