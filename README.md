@@ -25,33 +25,27 @@ cd grpc-service-rs
 ```shell
 cargo new --bin service
 cargo new --bin client
+cargo new --lib bindings
+cargo new --lib common
 mkdir -p proto/com/github/canardleteer/grpc_service_rs/v1alpha1
 touch proto/com/github/canardleteer/grpc_service_rs/v1alpha1/time.proto
-
-for PRJ in client service; do
-  pushd ${PRJ}
-    # Add our async runtime.
-    cargo add tokio@1 --features=macros,rt-multi-thread;
-    
-    # Add our CLI arg parser
-    cargo add clap@4 --features=derive,env,cargo
-
-    # Add a "bunch of service stuff"
-    cargo add tonic prost prost-types tonic-reflection tonic-health env_logger@0.10 tracing@0.1
-
-    # Add the Tracing Layer components + environment features.
-    cargo add tracing-subscriber --features=env-filter
-
-    # Add tonic-build to help build the grpc service.
-    cargo add tonic-build --build
-  popd
-done
-
-# Since we're in a larger git repository:
-rm -rf {client,service}/.git
+touch Cargo.toml
 ```
 
-- I also added `rust-toolchain.toml` files to both `service` & `client`.
+- I made this a workspace, by editing `Cargo.toml`.
+- I also added `rust-toolchain.toml`.
+- For both `service` and `client`, I added:
+
+```shell
+cargo add bindings --path ../bindings --rename time_service_bindings
+cargo add common --path ../common --rename time_service_common
+```
+
+- And for **all crates**, while writing code, I added `Cargo.toml` entries as
+  appropriate.
+
+You could pin some workspace crate versions here if you want to. I just didn't
+for this example.
 
 ## `proto`
 
@@ -69,33 +63,26 @@ buf lint proto
 buf format proto
 ```
 
-I don't use `buf` to build Rust, I let `prost` do that.
+I don't use `buf` to build Rust bindings, I let `prost` do that.
 
 Normally, I would let `proto` be a relative submodule, but not for this example.
 
-## I added `{client,service}/build.rs`
+## `bindings`
 
-I had to add a:
+This is just a crate that builds the proto and manages the client/service
+generated code.
 
-- `service/build.rs`
-- `client/build.rs`
+### I added `bindings/build.rs`
 
-...to build the protobuf bindings. These can become more interesting as you start
-to add things, like derive macros to the messages, or multiple proto files, but
-this is boring for this example.
+...to build the protobuf bindings. I keep these in a separate package than the
+rest, just because this is a workspace, and it's reasonable to. The `build.rs`
+could live in each one independently.  These can become more interesting as you
+start to add things, like derive macros to the messages, or multiple proto
+files, but this is boring for this example.
 
-This is generally just codegeneration shenanigans, that could be replaced with
-a package/crate if needed.
+This is generally just code generation shenanigans. YMMV.
 
-
-## The Service & Client Code
-
-- You can review the comments in the [service](service/src/main.rs) &
-  [client](client/src/main.rs) implementations.
-- There's more scaffolding in there then I'd normally "copy around," but it's
-  useful for these examples.
-
-## `protoc`
+### `protoc`
 
 If you don't have `protoc` installed, now would be a good time to install it.
 
@@ -108,6 +95,17 @@ On Ubuntu, for instance:
 sudo apt install protobuf-compiler
 ```
 
+## `common`
+
+This is a mock up of generally shared client code. It's nice and tidy, and off
+to the side so churn can happen here with automation, and not change anything
+close to the business logic.
+
+## The Service & Client Code
+
+- You can review the comments in the [service](service/src/main.rs) &
+  [client](client/src/main.rs) implementations.
+
 ## Running it
 
 - You'll probably want [grpcurl](https://github.com/fullstorydev/grpcurl) if
@@ -116,15 +114,13 @@ sudo apt install protobuf-compiler
 In one terminal window:
 
 ```shell
-cd service
-cargo run
+cargo run --bin service
 ```
 
 In another terminal window:
 
 ```shell
-cd client
-cargo run
+cargo run --bin client
 ```
 
 The output, from your client run, should look something like:
@@ -205,6 +201,3 @@ status: SERVING
 - Add some thin Docker containers
 - Add a `docker-compose.yaml`
   - Add useful proxying in the `docker-compose.yaml`
-- Overall, this may work better as a Cargo Workspace.
-  - Sharing a crate on top of a shared proto directory.
-  - Remove some of the uniform logging initalizers.
