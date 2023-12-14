@@ -193,8 +193,21 @@ status: SERVING
 {
   "status": "SERVING"
 }
-
 ```
+
+## Actions
+
+- We run the following steps in our GitHub Actions for all branches & PRs:
+  - `buf lint`
+  - `cargo check`
+  - `cargo fmt`
+  - `cargo clippy`
+- For Pull Requests, we perform a:
+  - `buf breaking`
+- For pushes to "special" branches, we perform a:
+  - `buf push`
+
+We can view the schema in the Buf Schema Registry: [https://buf.build/canardleteer/grpc-service-rs](https://buf.build/canardleteer/grpc-service-rs).
 
 ## TODO
 
