@@ -1,0 +1,43 @@
+---
+version: '3'
+services:
+  envoy:
+    # You can use a floating tag, like envoyproxy/envoy:dev
+    image: envoyproxy/envoy:dev-2d7c5aa597f958dcdbebc55268cccd571ad907a5
+    volumes:
+      - ./envoy/envoy.yaml:/envoy.yaml
+      # View the README on how to generate this:
+      # - ./envoy/time_service.binpb:/time_service.binpb
+    ports:
+      - "${PORT_ADMIN:-9901}:9901"
+      - "${PORT_TIME_SERVICE_PROXY:-10200}:10200"
+      - "${PORT_TIME_SERVICE_GRPC_WEB_PROXY:-10201}:10201"
+    command: "envoy -c /envoy.yaml"
+    depends_on:
+      - example-time-service-1
+      - example-time-service-2
+
+  example-time-service-1:
+    container_name: example-time-service-1
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+    - RUST_LOG=info
+    - SERVER_LISTEN_ADDR=0.0.0.0
+    - SERVER_LISTEN_PORT=20201
+    ports:
+     - "${PORT_EXAMPLE_TIME_SERVICE_1_DIRECT:-20201}:20201"
+
+  example-time-service-2:
+    container_name: example-time-service-2
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+    - RUST_LOG=info
+    - SERVER_LISTEN_ADDR=0.0.0.0
+    - SERVER_LISTEN_PORT=20202
+    ports:
+     - "${PORT_EXAMPLE_TIME_SERVICE_2_DIRECT:-20202}:20202"
+
