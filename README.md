@@ -144,18 +144,42 @@ grpcurl -plaintext localhost:50051 describe
 
 And you should see everything, including the comments in your proto file.
 
-```shell
+```text
 -> grpcurl -plaintext localhost:50051 describe
 com.github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService is a service:
 service SimpleTimestampService {
   // Returns the services current timestamp with no additional information.
   rpc WhatTimeIsIt ( .com.github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItRequest ) returns ( .com.github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItResponse );
 }
+grpc.health.v1.Health is a service:
+service Health {
+  // If the requested service is unknown, the call will fail with status
+  // NOT_FOUND.
+  rpc Check ( .grpc.health.v1.HealthCheckRequest ) returns ( .grpc.health.v1.HealthCheckResponse );
+  // Performs a watch for the serving status of the requested service.
+  // The server will immediately send back a message indicating the current
+  // serving status.  It will then subsequently send a new message whenever
+  // the service's serving status changes.
+  //
+  // If the requested service is unknown when the call is received, the
+  // server will send a message setting the serving status to
+  // SERVICE_UNKNOWN but will *not* terminate the call.  If at some
+  // future point, the serving status of the service becomes known, the
+  // server will send a new message with the service's serving status.
+  //
+  // If the call terminates with status UNIMPLEMENTED, then clients
+  // should assume this method is not supported and should not retry the
+  // call.  If the call terminates with any other status (including OK),
+  // clients should retry the call with appropriate exponential backoff.
+  rpc Watch ( .grpc.health.v1.HealthCheckRequest ) returns ( stream .grpc.health.v1.HealthCheckResponse );
+}
 grpc.reflection.v1alpha.ServerReflection is a service:
 service ServerReflection {
   // The reflection service is structured as a bidirectional stream, ensuring
   // all related requests go to a single server.
   rpc ServerReflectionInfo ( stream .grpc.reflection.v1alpha.ServerReflectionRequest ) returns ( stream .grpc.reflection.v1alpha.ServerReflectionResponse );
+}
+
 }
 ```
 
