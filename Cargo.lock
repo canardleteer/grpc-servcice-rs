@@ -271,19 +271,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "702fc72eb24e5a1e48ce58027a675bc24edd52096d5397d4aea7c6dd9eca0bd1"
 
 [[package]]
-name = "client"
-version = "0.1.0"
-dependencies = [
- "bindings",
- "clap",
- "common",
- "prost",
- "tokio",
- "tonic",
- "tracing",
-]
-
-[[package]]
 name = "colorchoice"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -933,22 +920,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "service"
-version = "0.1.0"
-dependencies = [
- "bindings",
- "clap",
- "common",
- "prost",
- "prost-types",
- "tokio",
- "tonic",
- "tonic-health",
- "tonic-reflection",
- "tracing",
-]
-
-[[package]]
 name = "sharded-slab"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1036,6 +1007,35 @@ checksum = "3fdd6f064ccff2d6567adcb3873ca630700f00b5ad3f060c25b5dcfd9a4ce152"
 dependencies = [
  "cfg-if",
  "once_cell",
+]
+
+[[package]]
+name = "time-service-client"
+version = "0.1.0"
+dependencies = [
+ "bindings",
+ "clap",
+ "common",
+ "prost",
+ "tokio",
+ "tonic",
+ "tracing",
+]
+
+[[package]]
+name = "time-service-server"
+version = "0.1.0"
+dependencies = [
+ "bindings",
+ "clap",
+ "common",
+ "prost",
+ "prost-types",
+ "tokio",
+ "tonic",
+ "tonic-health",
+ "tonic-reflection",
+ "tracing",
 ]
 
 [[package]]

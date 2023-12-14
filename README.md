@@ -23,8 +23,8 @@ cd grpc-service-rs
 ### Basic layout
 
 ```shell
-cargo new --bin service
-cargo new --bin client
+cargo new --bin time-service-server
+cargo new --bin time-service-client
 cargo new --lib bindings
 cargo new --lib common
 mkdir -p proto/com/github/canardleteer/grpc_service_rs/v1alpha1
@@ -34,7 +34,7 @@ touch Cargo.toml
 
 - I made this a workspace, by editing `Cargo.toml`.
 - I also added `rust-toolchain.toml`.
-- For both `service` and `client`, I added:
+- For both `time-service-server` and `time-service-client`, I added:
 
 ```shell
 cargo add bindings --path ../bindings --rename time_service_bindings
@@ -114,13 +114,13 @@ close to the business logic.
 In one terminal window:
 
 ```shell
-cargo run --bin service
+cargo run --bin time-service-server
 ```
 
 In another terminal window:
 
 ```shell
-cargo run --bin client
+cargo run --bin time-service-client
 ```
 
 The output, from your client run, should look something like:
