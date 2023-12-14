@@ -43,6 +43,7 @@ cargo add common --path ../common --rename time_service_common
 
 - And for **all crates**, while writing code, I added `Cargo.toml` entries as
   appropriate.
+- I later added some Docker "stuff," mostly in the `docker` directory.
 
 You could pin some workspace crate versions here if you want to. I just didn't
 for this example.
@@ -219,6 +220,26 @@ status: SERVING
 }
 ```
 
+## Docker Container
+
+You can build the container:
+
+```shell
+docker build -t grpc-service-rs:latest -f docker/Dockerfile .
+```
+
+You can run the server binary in the container:
+
+```shell
+docker run --rm -it -p 50051:50051 grpc-service-rs:latest
+```
+
+You can run the client binary inside the container as well:
+
+```shell
+docker run --rm -it -e USE_CLIENT_BINARY=true grpc-service-rs:latest
+```
+
 ## Actions
 
 - We run the following steps in our GitHub Actions for all branches & PRs:
@@ -230,11 +251,19 @@ status: SERVING
   - `buf breaking`
 - For pushes to "special" branches, we perform a:
   - `buf push`
+  - `docker build`
+  - `docker push`
 
-We can view the schema in the Buf Schema Registry: [https://buf.build/canardleteer/grpc-service-rs](https://buf.build/canardleteer/grpc-service-rs).
+I've omitted versioning for this example, but auto versioning pipelines are
+easy. I the past I've had luck with [cargo-smart-release](https://github.com/byron/cargo-smart-release),
+but there are likley more and better tools now.
+
+### Output
+
+- We can view the schema in the Buf Schema Registry: [https://buf.build/canardleteer/grpc-service-rs](https://buf.build/canardleteer/grpc-service-rs).
+- We can view the docker image on Dockerhub: [https://hub.docker.com/repository/docker/canardleteer/grpc-service-rs/](https://hub.docker.com/repository/docker/canardleteer/grpc-service-rs/)
 
 ## TODO
 
-- Add some thin Docker containers
 - Add a `docker-compose.yaml`
   - Add useful proxying in the `docker-compose.yaml`
