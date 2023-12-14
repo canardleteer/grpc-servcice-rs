@@ -15,9 +15,6 @@ jobs:
 
   cargo-check:
     name: cargo check
-    strategy:
-      matrix:
-        working_dir: [client, service]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,17 +24,12 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-          args: --manifest-path ${{ matrix.working_dir }}/Cargo.toml
       - uses: actions-rs/cargo@v1
         with:
           command: check
-          args: --manifest-path ${{ matrix.working_dir }}/Cargo.toml
 
   cargo-fmt:
     name: cargo fmt
-    strategy:
-      matrix:
-        working_dir: [client, service]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -51,13 +43,10 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args: --all --manifest-path ${{ matrix.working_dir }}/Cargo.toml -- --check
+          args: --all -- --check
 
   cargo-clippy:
     name: cargo clippy
-    strategy:
-      matrix:
-        working_dir: [client, service]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -71,4 +60,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --manifest-path ${{ matrix.working_dir }}/Cargo.toml -- -D warnings
+          args: -- -D warnings

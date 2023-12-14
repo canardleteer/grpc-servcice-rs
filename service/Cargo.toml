@@ -7,15 +7,12 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4", features = ["derive", "env", "cargo"] }
-env_logger = "0.10"
 prost = "0.12.3"
 prost-types = "0.12.3"
+time_service_bindings = { version = "0.1.0", path = "../bindings", package = "bindings" }
+time_service_common = { version = "0.1.0", path = "../common", package = "common" }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tonic = "0.10.2"
 tonic-health = "0.10.2"
 tonic-reflection = "0.10.2"
-tracing = "0.1"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-
-[build-dependencies]
-tonic-build = "0.10.2"
+tracing = "0.1.0"
