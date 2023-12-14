@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+name: publish
+
+jobs:
+  buf-publish:
+    name: buf publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bufbuild/buf-setup-action@v1.28.1
+        with:
+          github_token: ${{ github.token }}
+      - uses: bufbuild/buf-lint-action@v1
+        with:
+          input: proto
+      - run: buf format -d --exit-code proto
+      - uses: bufbuild/buf-push-action@v1
+        with:
+          buf_token: ${{ secrets.BUF_TOKEN }}
+          draft: ${{ github.ref_name != 'main'}}
+          input: proto
+  
