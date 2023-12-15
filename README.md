@@ -27,8 +27,8 @@ cargo new --bin time-service-server
 cargo new --bin time-service-client
 cargo new --lib bindings
 cargo new --lib common
-mkdir -p proto/com/github/canardleteer/grpc_service_rs/v1alpha1
-touch proto/com/github/canardleteer/grpc_service_rs/v1alpha1/time.proto
+mkdir -p proto/github/canardleteer/grpc_service_rs/v1alpha1
+touch proto/github/canardleteer/grpc_service_rs/v1alpha1/time.proto
 touch Cargo.toml
 ```
 
@@ -147,10 +147,10 @@ And you should see everything, including the comments in your proto file.
 
 ```text
 -> grpcurl -plaintext localhost:50051 describe
-com.github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService is a service:
+github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService is a service:
 service SimpleTimestampService {
   // Returns the services current timestamp with no additional information.
-  rpc WhatTimeIsIt ( .com.github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItRequest ) returns ( .com.github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItResponse );
+  rpc WhatTimeIsIt ( .github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItRequest ) returns ( .github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItResponse );
 }
 grpc.health.v1.Health is a service:
 service Health {
@@ -194,7 +194,7 @@ And you'll see what we offer:
 
 ```shell
 -> grpcurl -plaintext localhost:50051 list
-com.github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService
+github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService
 grpc.health.v1.Health
 grpc.reflection.v1alpha.ServerReflection
 ```
@@ -271,7 +271,7 @@ Basic `docker compose` with Envoy:
 docker compose up --build
 
 grpcurl -plaintext localhost:10200 describe
-grpcurl -plaintext localhost:10200 com.github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService/WhatTimeIsIt
+grpcurl -plaintext localhost:10200 github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService/WhatTimeIsIt
 ```
 
 ### Advanced `docker compose` with Envoy
