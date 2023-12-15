@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package com.github.canardleteer.grpc_service_rs.v1alpha1;
+package github.canardleteer.grpc_service_rs.v1alpha1;
 
 service SimpleTimestampService {
   // Returns the services current timestamp with no additional information.

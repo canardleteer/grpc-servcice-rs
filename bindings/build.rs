@@ -20,7 +20,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_client(true)
         .file_descriptor_set_path(descriptor_path)
         .compile(
-            &["com/github/canardleteer/grpc_service_rs/v1alpha1/time.proto"],
+            &["github/canardleteer/grpc_service_rs/v1alpha1/time.proto"],
             &["../proto"],
         )?;
     Ok(())
