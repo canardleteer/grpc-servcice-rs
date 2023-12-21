@@ -2,16 +2,24 @@ on: [pull_request]
 
 name: breaking
 
+env:
+  BUF_VERSION: 1.28.1
+
 jobs:
   validate-protos:
     name: buf breaking
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: bufbuild/buf-setup-action@v1.28.1
+
+      - name: fetch buf
+        uses: bufbuild/buf-setup-action@v1.28.1
         with:
             github_token: ${{ github.token }}
-      - uses: bufbuild/buf-breaking-action@v1
+            version: ${{ env.BUF_VERSION }}
+
+      - name: buf breaking
+        uses: bufbuild/buf-breaking-action@v1
         with:
           against: 'https://github.com/canardleteer/grpc-service-rs.git#branch=main,subdir=proto'
           input: proto

@@ -6,44 +6,64 @@ on:
 
 name: publish
 
+env:
+  BUF_VERSION: 1.28.1
+
 jobs:
   buf-publish:
     name: buf publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: bufbuild/buf-setup-action@v1.28.1
+
+      - name: fetch buf
+        uses: bufbuild/buf-setup-action@v1.28.1
         with:
           github_token: ${{ github.token }}
-      - uses: bufbuild/buf-lint-action@v1
+          version: ${{ env.BUF_VERSION }}
+
+      - name: buf lint
+        uses: bufbuild/buf-lint-action@v1
         with:
           input: proto
-      - run: buf format -d --exit-code proto
-      - uses: bufbuild/buf-push-action@v1
+
+      - name: buf format
+        run: buf format -d --exit-code proto
+
+      # NOTE: We will allow breaking changes, at the moment.
+      #
+      # - name: buf breaking
+      #   uses: bufbuild/buf-breaking-action@v1
+      #   with:
+      #     against: 'https://github.com/canardleteer/grpc-service-rs.git#branch=main,subdir=proto'
+      #     input: proto
+
+      - name: buf push
+        uses: bufbuild/buf-push-action@v1
         with:
           buf_token: ${{ secrets.BUF_TOKEN }}
           draft: ${{ github.ref_name != 'main'}}
           input: proto
+
   docker-build-push:
     name: docker build and push
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
+      - name: login to dockerhub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
       
-      - name: Extract metadata (tags, labels) for Docker
+      - name: extract metadata (tags, labels) for docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ vars.DOCKERHUB_REPO }}
       
-      - name: Build and push Docker image
+      - name: build and push docker image
         uses: docker/build-push-action@v5
         with:
           context: .
