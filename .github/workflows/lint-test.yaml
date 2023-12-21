@@ -3,6 +3,7 @@ on: [push, pull_request]
 name: lint
 
 env:
+  CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
   BUF_VERSION: 1.28.1
 
 jobs:
