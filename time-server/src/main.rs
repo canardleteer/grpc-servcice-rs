@@ -1,20 +1,13 @@
 use clap::Parser;
-use time_svc_decl::{
-    simple_timestamp_service_server::SimpleTimestampService, WhatTimeIsItRequest,
-    WhatTimeIsItResponse,
-};
 
-use std::{
-    net::{IpAddr, SocketAddr},
-    time::{SystemTime, UNIX_EPOCH},
-};
-use tonic::{transport::Server, Request, Response, Status};
+use std::net::{IpAddr, SocketAddr};
+use tonic::transport::Server;
 use tracing::{info, instrument, warn};
+use tracing_subscriber::{filter::LevelFilter, layer::SubscriberExt, Layer, Registry};
 
-use crate::time_svc_decl::simple_timestamp_service_server::SimpleTimestampServiceServer;
-
-use time_service_bindings::{time_svc_decl, TIME_SVC_FILE_DESCRIPTOR_SET};
-use time_service_common::setup_logging;
+use time_bindings::grpc::v1alpha1::simple_timestamp_service_server::SimpleTimestampServiceServer;
+use time_bindings::grpc::v1alpha1::TIME_SVC_FILE_DESCRIPTOR_SET;
+use time_service::grpc::v1alpha1::TimeServiceGRPCV1Alpha1;
 
 /// This is generally our Command Line Arguments declaration for the service,
 /// nothing fancy here.
@@ -73,11 +66,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // always reports SERVING while the process is up.
     let (mut health_reporter, health_svc) = tonic_health::server::health_reporter();
     health_reporter
-        .set_serving::<SimpleTimestampServiceServer<TimeService>>()
+        .set_serving::<SimpleTimestampServiceServer<TimeServiceGRPCV1Alpha1>>()
         .await;
 
     // This is our actual service, that we intend to expose.
-    let time_svc = TimeService::default();
+    let time_svc = TimeServiceGRPCV1Alpha1::default();
 
     // This will hold the process alive in a serve loop until there's reason
     // to end it.
@@ -92,25 +85,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// TimeService is our actual service.
-#[derive(Default, Debug)]
-struct TimeService {}
+/// In general, this should lead to a more common definition, that is uniform for
+/// your services fleet, wiring up to your observability stack as
+/// appropriate.
+///
+/// This is somewhat overkill for this example, but get's things in place
+/// for the layered approach for tracing.
+pub fn setup_logging() {
+    // Filter our emissions, based on environment.
+    let text_filter = tracing_subscriber::EnvFilter::builder()
+        .with_default_directive(LevelFilter::INFO.into())
+        .from_env_lossy();
+    let text_filter_level = text_filter.max_level_hint();
 
-/// This is the implementation, of our gRPC Service, for TimeService.
-#[tonic::async_trait]
-impl SimpleTimestampService for TimeService {
-    // This is the one verb we support.
-    #[instrument(level = "info")]
-    async fn what_time_is_it(
-        &self,
-        _request: Request<WhatTimeIsItRequest>,
-    ) -> Result<Response<WhatTimeIsItResponse>, Status> {
-        let since_the_epoch = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map_err(|_| Status::internal("the service is time travelling again"))?;
+    // We only intend to ship logs via stdout, in this example.
+    let stdout_layer = tracing_subscriber::fmt::layer()
+        .pretty()
+        .with_filter(text_filter);
 
-        Ok(Response::new(WhatTimeIsItResponse {
-            seconds_since_epoch: since_the_epoch.as_secs(),
-        }))
+    // Make a telemetry Subscriber, from the overall Tracing system.
+    let subscriber = Registry::default().with(stdout_layer);
+
+    // And set this Subscriber, as the global defaul for this application.
+    match tracing::subscriber::set_global_default(subscriber) {
+        Ok(_) => {
+            warn!("Text to stdout Level set to: {:?}", text_filter_level);
+        }
+        Err(e) => {
+            panic!("Unable to setup logging, failing: {}", e)
+        }
     }
 }
