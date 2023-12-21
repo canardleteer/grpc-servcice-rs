@@ -1,21 +1,20 @@
 ARG BUILDER_BASE_IMAGE="rust:bullseye"
 ARG RUNNER_BASE_IMAGE="debian:bullseye-slim"
 
-ARG SERVICE_BIN=time-service-server
-ARG CLIENT_BIN=time-service-client
+ARG SERVER_BIN=time-server
+ARG CLIENT_BIN=time-client
 
-ARG ENTRYPOINT_LOCAL=docker/scripts/image-entrypoint.sh
+ARG ENTRYPOINT_LOCAL=docker/scripts/time-image-entrypoint.sh
 
-ARG SERVICE_BIN_BUILDER=target/release/${SERVICE_BIN}
+ARG SERVER_BIN_BUILDER=target/release/${SERVER_BIN}
 ARG CLIENT_BIN_BUILDER=target/release/${CLIENT_BIN}
 
-ARG SERVICE_BIN_RUNNER=/usr/bin/${SERVICE_BIN}
+ARG SERVER_BIN_RUNNER=/usr/bin/${SERVER_BIN}
 ARG CLIENT_BIN_RUNNER=/usr/bin/${CLIENT_BIN}
 
-
-## Build
+## Build Binaries
 FROM ${BUILDER_BASE_IMAGE} as builder
-ARG SERVICE_BIN
+ARG SERVER_BIN
 ARG CLIENT_BIN
 
 WORKDIR /app
@@ -35,34 +34,38 @@ RUN curl -LO $PB_REL/download/v${PB_VERSION}/protoc-${PB_VERSION}-linux-x86_64.z
     unzip protoc-${PB_VERSION}-linux-x86_64.zip -d /usr/local
 
 # Build our binaries (NOTE: --release).
-RUN cargo build --release --bin ${SERVICE_BIN} --bin ${CLIENT_BIN}
+RUN cargo build --release --bin ${SERVER_BIN} --bin ${CLIENT_BIN}
 
 ## Build Runner
 FROM ${RUNNER_BASE_IMAGE} AS runner
 ARG ENTRYPOINT_LOCAL
 ARG CLIENT_BIN_BUILDER
 ARG CLIENT_BIN_RUNNER
-ARG SERVICE_BIN_RUNNER
-ARG SERVICE_BIN_BUILDER
+ARG SERVER_BIN_BUILDER
+ARG SERVER_BIN_RUNNER
 
 RUN apt update && \
     apt-get install -y --no-install-recommends apt-utils && \
     apt install -y netcat dnsutils && \
     rm -rf /var/lib/apt/lists/*
 
-COPY ${ENTRYPOINT_LOCAL} /usr/bin/image-entrypoint.sh
-COPY --from=builder /app/${SERVICE_BIN_BUILDER} ${SERVICE_BIN_RUNNER}
+COPY ${ENTRYPOINT_LOCAL} /usr/bin/time-image-entrypoint.sh
+COPY --from=builder /app/${SERVER_BIN_BUILDER} ${SERVER_BIN_RUNNER}
 COPY --from=builder /app/${CLIENT_BIN_BUILDER} ${CLIENT_BIN_RUNNER}
 
+# TEMPLATE_NOTE(canardleteer): The executable bit doesn't seem to copy forward
+#                              from the template.
+RUN chmod +x /usr/bin/time-image-entrypoint.sh
 
+## Runner Environment
 ENV RUST_LOG=info
 ENV SERVER_LISTEN_ADDR=0.0.0.0
 ENV SERVER_LISTEN_PORT=50051
-ENV SERVER_ADDR=${SERVER_LISTEN_ADDR}
-ENV SERVER_PORT=${SERVER_LISTEN_PORT}
+ENV TARGET_SERVER_ADDR=${SERVER_LISTEN_ADDR}
+ENV TARGET_SERVER_PORT=${SERVER_LISTEN_PORT}
 ENV USE_CLIENT_BINARY=false
 
-ENV SERVER_ENTRYPOINT_BINARY=${SERVICE_BIN_RUNNER}
+ENV SERVER_ENTRYPOINT_BINARY=${SERVER_BIN_RUNNER}
 ENV CLIENT_ENTRYPOINT_BINARY=${CLIENT_BIN_RUNNER}
 
-ENTRYPOINT ["/usr/bin/image-entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/time-image-entrypoint.sh"]

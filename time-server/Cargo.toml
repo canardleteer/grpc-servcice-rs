@@ -1,5 +1,5 @@
 [package]
-name = "time-service-server"
+name = "time-server"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,10 +7,11 @@ edition = "2021"
 clap = { version = "4", features = ["derive", "env", "cargo"] }
 prost = "0.12.3"
 prost-types = "0.12.3"
-time_service_bindings = { version = "0.1.0", path = "../bindings", package = "bindings" }
-time_service_common = { version = "0.1.0", path = "../common", package = "common" }
+time_bindings = { version = "0.1.0", path = "../time-bindings", package = "time-bindings" }
+time_service = { version = "0.1.0", path = "../time-service", package = "time-service" }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tonic = "0.10.2"
 tonic-health = "0.10.2"
 tonic-reflection = "0.10.2"
 tracing = "0.1.0"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }

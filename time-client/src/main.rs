@@ -1,14 +1,10 @@
 use clap::Parser;
-use time_svc_decl::WhatTimeIsItRequest;
+use time_service_bindings::grpc::v1alpha1::WhatTimeIsItRequest;
 
-use std::net::IpAddr;
 use tonic::Request;
 use tracing::{instrument, warn};
 
-use crate::time_svc_decl::simple_timestamp_service_client::SimpleTimestampServiceClient;
-
-use time_service_bindings::time_svc_decl;
-use time_service_common::setup_logging;
+use time_service_bindings::grpc::v1alpha1::simple_timestamp_service_client::SimpleTimestampServiceClient;
 
 /// This is generally our Command Line Arguments declaration for the client,
 /// nothing fancy here.
@@ -21,9 +17,9 @@ struct Cli {
         short = 'a',
         long,
         default_value = "127.0.0.1",
-        env = "SERVER_ADDR"
+        env = "TARGET_SERVER_ADDR"
     )]
-    service_addr: IpAddr,
+    service_addr: String,
 
     #[clap(
         help_heading = "server",
@@ -31,7 +27,7 @@ struct Cli {
         long,
         default_value = "50051",
         help_heading = "client",
-        env = "SERVER_PORT"
+        env = "TARGET_SERVER_PORT"
     )]
     service_port: u16,
 }
@@ -42,9 +38,6 @@ struct Cli {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Parse our CLI Args
     let args = Cli::parse();
-
-    // Setup logging. See the notes in the service for more information.
-    setup_logging();
 
     // Build a client.
     let mut client = SimpleTimestampServiceClient::connect(format!(

@@ -3,8 +3,8 @@
 resolver = "2"
 
 members = [
-    "time-service-server",
-    "time-service-client",
-    "bindings",
-    "common"
+    "time-server",
+    "time-client",
+    "time-bindings",
+    "time-service"
 ]

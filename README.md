@@ -225,19 +225,27 @@ status: SERVING
 You can build the container:
 
 ```shell
-docker build -t grpc-service-rs:latest -f docker/Dockerfile .
+docker build -t time:latest -f docker/Dockerfile .
 ```
 
-You can run the server binary in the container:
+You can test the container:
 
 ```shell
-docker run --rm -it -p 50051:50051 grpc-service-rs:latest
-```
+docker network create time-network
+docker run --rm -it -d \
+    --name time_server \
+    --net time-network \
+    -p 50051:50051 \
+    time:latest
 
-You can run the client binary inside the container as well:
+docker run --rm -it \
+    --net time-network \
+    -e USE_CLIENT_BINARY=true \
+    time:latest -a time_server
 
-```shell
-docker run --rm -it -e USE_CLIENT_BINARY=true grpc-service-rs:latest
+# cleanup
+docker rm -f time_server
+docker network remove time-network
 ```
 
 ## Actions
@@ -247,6 +255,7 @@ docker run --rm -it -e USE_CLIENT_BINARY=true grpc-service-rs:latest
   - `cargo check`
   - `cargo fmt`
   - `cargo clippy`
+  - `cargo test`
 - For Pull Requests, we perform a:
   - `buf breaking`
 - For pushes to "special" branches, we perform a:
@@ -274,7 +283,7 @@ grpcurl -plaintext localhost:10200 describe
 grpcurl -plaintext localhost:10200 github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService/WhatTimeIsIt
 ```
 
-### Advanced `docker compose` with Envoy
+### Advanced Envoy with `docker compose`
 
 **NOTE:** I haven't quite gotten gRPC transcoding working yet.
 
