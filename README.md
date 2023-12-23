@@ -83,10 +83,18 @@ files, but this is boring for this example.
 
 This is generally just code generation shenanigans. YMMV.
 
-You can dive deeper into using `buf` for Rust code generation, but it's not
+- You can dive deeper into using `buf` for Rust code generation, but it's not
 really necessary for this example. If you're interested, you can convert the
 `time-bindings/build.rs` file into a `buf.gen.yaml` by using the
 [protoc-gen-prost](https://github.com/neoeinstein/protoc-gen-prost) plugin.
+
+- If you want to do something like JSON transcoding (or anything supported by
+  [serde](https://serde.rs/)), you can take a look at
+  [adding attributes to generated types with tonic_build](https://docs.rs/tonic-build/latest/tonic_build/struct.Builder.html#method.type_attribute). In general, annotations on generated code,
+  is fairly useful.
+
+- There's a lot of useful stuff in [tonic_build::Builder](https://docs.rs/tonic-build/latest/tonic_build/struct.Builder.html)
+  that's worth learning about (`generate_default_stubs`, for example).
 
 ### `protoc`
 
