@@ -25,8 +25,8 @@ cd grpc-service-rs
 ```shell
 cargo new --bin time-service-server
 cargo new --bin time-service-client
-cargo new --lib bindings
-cargo new --lib common
+cargo new --lib time-bindings
+cargo new --lib time-common
 mkdir -p proto/github/canardleteer/grpc_service_rs/v1alpha1
 touch proto/github/canardleteer/grpc_service_rs/v1alpha1/time.proto
 touch Cargo.toml
@@ -37,8 +37,8 @@ touch Cargo.toml
 - For both `time-service-server` and `time-service-client`, I added:
 
 ```shell
-cargo add bindings --path ../bindings --rename time_service_bindings
-cargo add common --path ../common --rename time_service_common
+cargo add time-bindings --path ../time-bindings  --rename time_bindings
+cargo add time-service --path ../time-service --rename time_service
 ```
 
 - And for **all crates**, while writing code, I added `Cargo.toml` entries as
@@ -101,7 +101,7 @@ On Ubuntu, for instance:
 sudo apt install protobuf-compiler
 ```
 
-## `common`
+## `time-common`
 
 This is a mock up of generally shared client code. It's nice and tidy, and off
 to the side so churn can happen here with automation, and not change anything
@@ -109,8 +109,8 @@ close to the business logic.
 
 ## The Service & Client Code
 
-- You can review the comments in the [service](service/src/main.rs) &
-  [client](client/src/main.rs) implementations.
+- You can review the comments in the [time-service](time-service/src/main.rs) &
+  [time-client](time-client/src/main.rs) implementations.
 
 ## Running it
 
