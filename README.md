@@ -73,7 +73,7 @@ Normally, I would let `proto` be a relative submodule, but not for this example.
 This is just a crate that builds the proto and manages the client/service
 generated code.
 
-### I added `bindings/build.rs`
+### I added `time-bindings/build.rs`
 
 ...to build the protobuf bindings. I keep these in a separate package than the
 rest, just because this is a workspace, and it's reasonable to. The `build.rs`
@@ -82,6 +82,11 @@ start to add things, like derive macros to the messages, or multiple proto
 files, but this is boring for this example.
 
 This is generally just code generation shenanigans. YMMV.
+
+You can dive deeper into using `buf` for Rust code generation, but it's not
+really necessary for this example. If you're interested, you can convert the
+`time-bindings/build.rs` file into a `buf.gen.yaml` by using the
+[protoc-gen-prost](https://github.com/neoeinstein/protoc-gen-prost) plugin.
 
 ### `protoc`
 
