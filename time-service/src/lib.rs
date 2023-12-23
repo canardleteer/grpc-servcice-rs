@@ -67,13 +67,18 @@ pub mod grpc {
                     seconds_since_epoch: since_the_epoch.as_secs(),
                 }))
             }
+
+            // NOTE(canardleteer): We rely upon the default implementation of
+            //                     `SomethingUnimplemented`. which returns
+            //                     `NOT_IMPLEMENTED`.
         }
 
         // Resource layer testing.
         #[cfg(test)]
         mod test {
             use super::{SimpleTimestampService, TimeServiceGRPCV1Alpha1, WhatTimeIsItRequest};
-            use tonic::Request;
+            use time_bindings::grpc::v1alpha1::SomethingUnimplementedRequest;
+            use tonic::{Request, Status};
 
             #[tokio::test(flavor = "multi_thread")]
             async fn what_time_is_it() {
@@ -86,6 +91,16 @@ pub mod grpc {
                     .expect("a result, not a status");
 
                 assert_ne!(rsp.get_ref().seconds_since_epoch, 0);
+            }
+
+            #[tokio::test(flavor = "multi_thread")]
+            async fn something_unimplemented() {
+                let ts = TimeServiceGRPCV1Alpha1::default();
+
+                let req = Request::new(SomethingUnimplementedRequest {});
+                let err = ts.something_unimplemented(req).await.unwrap_err();
+
+                assert_eq!(err.code(), Status::unimplemented("").code());
             }
         }
     }

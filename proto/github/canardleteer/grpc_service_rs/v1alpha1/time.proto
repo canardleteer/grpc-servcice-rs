@@ -5,6 +5,9 @@ package github.canardleteer.grpc_service_rs.v1alpha1;
 service SimpleTimestampService {
   // Returns the services current timestamp with no additional information.
   rpc WhatTimeIsIt(WhatTimeIsItRequest) returns (WhatTimeIsItResponse);
+
+  // This exists to show an unimplemented method.
+  rpc SomethingUnimplemented(SomethingUnimplementedRequest) returns (SomethingUnimplementedResponse);
 }
 
 // Requests the current time.
@@ -15,3 +18,9 @@ message WhatTimeIsItRequest {}
 message WhatTimeIsItResponse {
   uint64 seconds_since_epoch = 1;
 }
+
+// Unimplemented Request
+message SomethingUnimplementedRequest {}
+
+// Unimplemented Response
+message SomethingUnimplementedResponse {}

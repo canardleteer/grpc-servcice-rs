@@ -34,23 +34,16 @@ touch Cargo.toml
 
 - I made this a workspace, by editing `Cargo.toml`.
 - I also added `rust-toolchain.toml`.
-- For both `time-service-server` and `time-service-client`, I added:
-
-```shell
-cargo add time-bindings --path ../time-bindings  --rename time_bindings
-cargo add time-service --path ../time-service --rename time_service
-```
-
+- I added `time-*` relative path dependencies to other `time-*`` packages as
+  appropriate.
 - And for **all crates**, while writing code, I added `Cargo.toml` entries as
   appropriate.
 - I later added some Docker "stuff," mostly in the `docker` directory.
 
-You could pin some workspace crate versions here if you want to. I just didn't
-for this example.
-
 ## `proto`
 
-I had to build out a protobuf declaration.
+I had to build out a protobuf declaration. This service just has 2 verbs, one
+that returns the time, and another that's not implemented and a stub.
 
 I lint & format with [buf](https://github.com/bufbuild/buf).
 
@@ -66,7 +59,8 @@ buf format proto
 
 I don't use `buf` to build Rust bindings, I let `prost` do that.
 
-Normally, I would let `proto` be a relative submodule, but not for this example.
+Normally, I would let `proto` be a relative submodule, but not for this
+example.
 
 ## `bindings`
 
@@ -77,16 +71,16 @@ generated code.
 
 ...to build the protobuf bindings. I keep these in a separate package than the
 rest, just because this is a workspace, and it's reasonable to. The `build.rs`
-could live in each one independently.  These can become more interesting as you
+could live in each one independently. `build.rs` can become more interesting as you
 start to add things, like derive macros to the messages, or multiple proto
 files, but this is boring for this example.
 
 This is generally just code generation shenanigans. YMMV.
 
 - You can dive deeper into using `buf` for Rust code generation, but it's not
-really necessary for this example. If you're interested, you can convert the
-`time-bindings/build.rs` file into a `buf.gen.yaml` by using the
-[protoc-gen-prost](https://github.com/neoeinstein/protoc-gen-prost) plugin.
+  really necessary for this example. If you're interested, you can convert the
+  `time-bindings/build.rs` file into a `buf.gen.yaml` by using the
+  [protoc-gen-prost](https://github.com/neoeinstein/protoc-gen-prost) plugin.
 
 - If you want to do something like JSON transcoding (or anything supported by
   [serde](https://serde.rs/)), you can take a look at
@@ -109,15 +103,17 @@ On Ubuntu, for instance:
 sudo apt install protobuf-compiler
 ```
 
-## `time-common`
+## The Service Code: `time-service`
 
-This is a mock up of generally shared client code. It's nice and tidy, and off
-to the side so churn can happen here with automation, and not change anything
-close to the business logic.
+This is the actual Service implementation of an extremely boring service. Also
+in here, is the Resource implementation for this particular gRPC binding.
 
-## The Service & Client Code
+I have not implemented the `SomethingUnimplemented` method, just to show
+that default implementations work and return `NOT_IMPLEMENTED`.
 
-- You can review the comments in the [time-service](time-service/src/main.rs) &
+## The Server & Client Application Code
+
+- You can review the comments in the [time-server](time-server/src/main.rs) &
   [time-client](time-client/src/main.rs) implementations.
 
 ## Running it
@@ -162,6 +158,8 @@ And you should see everything, including the comments in your proto file.
 -> grpcurl -plaintext localhost:50051 describe
 github.canardleteer.grpc_service_rs.v1alpha1.SimpleTimestampService is a service:
 service SimpleTimestampService {
+  // This exists to show an unimplemented method.
+  rpc SomethingUnimplemented ( .github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItRequest ) returns ( .github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItResponse );
   // Returns the services current timestamp with no additional information.
   rpc WhatTimeIsIt ( .github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItRequest ) returns ( .github.canardleteer.grpc_service_rs.v1alpha1.WhatTimeIsItResponse );
 }
@@ -192,8 +190,6 @@ service ServerReflection {
   // The reflection service is structured as a bidirectional stream, ensuring
   // all related requests go to a single server.
   rpc ServerReflectionInfo ( stream .grpc.reflection.v1alpha.ServerReflectionRequest ) returns ( stream .grpc.reflection.v1alpha.ServerReflectionResponse );
-}
-
 }
 ```
 
