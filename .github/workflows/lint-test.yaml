@@ -40,7 +40,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: 1.74.1
+          toolchain: 1.78.0
           components: clippy, rustfmt
 
       - name: rust cache setup
@@ -79,7 +79,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: 1.74.1
+          toolchain: 1.78.0
           components: clippy, rustfmt
 
       - name: rust cache setup
