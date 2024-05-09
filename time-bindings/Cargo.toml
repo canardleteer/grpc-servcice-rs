@@ -12,3 +12,4 @@ tracing = "0.1"
 
 [build-dependencies]
 tonic-build = "0.10.2"
+walkdir = "2.5.0"
