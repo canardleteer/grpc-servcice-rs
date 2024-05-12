@@ -7,7 +7,7 @@ on:
 name: publish
 
 env:
-  BUF_VERSION: 1.28.1
+  BUF_VERSION: 1.31.0
 
 jobs:
   buf-publish:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: fetch buf
-        uses: bufbuild/buf-setup-action@v1.28.1
+        uses: bufbuild/buf-setup-action@v1.31.0
         with:
           github_token: ${{ github.token }}
           version: ${{ env.BUF_VERSION }}
