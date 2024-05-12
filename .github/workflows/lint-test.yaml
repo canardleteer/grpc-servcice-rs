@@ -37,9 +37,8 @@ jobs:
         run: sudo apt install -y protobuf-compiler
 
       - name: rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
           toolchain: 1.78.0
           components: clippy, rustfmt
 
@@ -47,21 +46,11 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: cargo check
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-
+        run: cargo check
       - name: cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
-
+        run: cargo fmt --all -- --check
       - name: cargo clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
+        run: cargo clippy -- -D warnings
 
   cargo-test:
     name: cargo test
@@ -76,9 +65,8 @@ jobs:
         run: sudo apt install -y protobuf-compiler
 
       - name: rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
           toolchain: 1.78.0
           components: clippy, rustfmt
 
@@ -86,9 +74,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: cargo test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
+        run: cargo test
 
   docker-build:
     name: docker build
